@@ -2,6 +2,10 @@
 import os
 import shutil
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import requests
 from flask import Flask, jsonify, render_template, request, session
 
@@ -19,7 +23,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
 # API KEY
-API_KEY = "AIzaSyC3StswsNoHgnKUWE4WEQ7Ocg1v8AcKMtQ"
+API_KEY = api_key=os.getenv("GEMINI_API_KEY")
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
 
 def call_gemini_api(user_input, history=[]):
