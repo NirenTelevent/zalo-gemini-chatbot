@@ -10,7 +10,7 @@ def load_doc_knowledge(docx_path="data/demo_data.docx"):
     doc = Document(docx_path)
     return "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
 
-# Tải nội dung tài liệu nội bộ
+# Tải nội dung tài liệu sản phẩm, chính sách, khuyến mãi...
 DOC_KNOWLEDGE = load_doc_knowledge()
 
 def agent_tracuu_tailieu(user_question: str):
@@ -20,10 +20,11 @@ def agent_tracuu_tailieu(user_question: str):
     Nếu không liên quan → trả lại None.
     """
     keywords = [
-        "ngành", "đào tạo", "điểm chuẩn", "học phí", "học bổng",
-        "cơ sở vật chất", "thư viện", "ký túc xá", "khoa", "chuyên ngành"
+        "sữa", "sản phẩm", "dành cho bé", "sữa bầu", "sữa mẹ", "giá", 
+        "khuyến mãi", "ưu đãi", "tặng", "giao hàng", "thanh toán", 
+        "thành phần", "xuất xứ", "cách dùng", "thời hạn", "đổi trả"
     ]
     lower_q = user_question.lower()
     if any(kw in lower_q for kw in keywords):
-        return f"(📘 Trích xuất từ tài liệu nội bộ)\n{DOC_KNOWLEDGE}"
+        return f"(📘 Thông tin từ tài liệu nội bộ Thế Giới Sữa Mẹ Xíu)\n{DOC_KNOWLEDGE}"
     return None
