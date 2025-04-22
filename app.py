@@ -98,6 +98,8 @@ from flask import send_from_directory
 def verify_zalo():
     return send_from_directory('static', 'zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
 
+import json
+
 from flask import jsonify, request
 
 from zalo_webhook_handler import send_zalo_reply  # import hàm bạn vừa tạo
@@ -106,20 +108,22 @@ from zalo_webhook_handler import send_zalo_reply  # import hàm bạn vừa tạ
 @app.route('/webhook', methods=['POST'])
 def zalo_webhook():
     data = request.get_json()
-    print("📩 Nhận dữ liệu từ Zalo:", data)
 
-    # Lấy user_id và message từ payload
-    try:
-        user_id = data["sender"]["id"]
-        user_message = data["message"]["text"]
-    except Exception as e:
-        print("❌ Lỗi parse JSON:", e)
-        return jsonify({"status": "invalid payload"}), 400
+    # Ghi log ra file
+    with open("data/last_webhook.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # Gửi phản hồi đơn giản (sau này thay bằng Gemini)
-    send_zalo_reply(user_id, f"Bot nhà Sữa Mẹ Xíu nhận được: {user_message}")
-
+    # (Có thể gửi phản hồi ở đây nếu cần)
     return jsonify({"status": "received"}), 200
+
+@app.route('/test-log')
+def test_log():
+    try:
+        with open("data/last_webhook.json", encoding="utf-8") as f:
+            data = json.load(f)
+        return f"<pre>{json.dumps(data, indent=2, ensure_ascii=False)}</pre>"
+    except Exception as e:
+        return f"Lỗi đọc file: {e}"
 
 
 if __name__ == '__main__':
