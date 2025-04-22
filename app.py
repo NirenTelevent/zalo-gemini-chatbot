@@ -98,10 +98,6 @@ from flask import send_from_directory
 def verify_zalo():
     return send_from_directory('static', 'zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
 
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
-
 from flask import jsonify, request
 
 
@@ -112,3 +108,8 @@ def zalo_webhook():
     
     # Trả về 200 OK ngay lập tức
     return jsonify({"status": "received"}), 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
+
+
