@@ -100,14 +100,27 @@ def verify_zalo():
 
 from flask import jsonify, request
 
+from zalo_webhook_handler import send_zalo_reply  # import hàm bạn vừa tạo
+
 
 @app.route('/webhook', methods=['POST'])
 def zalo_webhook():
     data = request.get_json()
-    print("📩 Nhận request webhook từ Zalo:", data)
-    
-    # Trả về 200 OK ngay lập tức
+    print("📩 Nhận dữ liệu từ Zalo:", data)
+
+    # Lấy user_id và message từ payload
+    try:
+        user_id = data["sender"]["id"]
+        user_message = data["message"]["text"]
+    except Exception as e:
+        print("❌ Lỗi parse JSON:", e)
+        return jsonify({"status": "invalid payload"}), 400
+
+    # Gửi phản hồi đơn giản (sau này thay bằng Gemini)
+    send_zalo_reply(user_id, f"Bot nhà Sữa Mẹ Xíu nhận được: {user_message}")
+
     return jsonify({"status": "received"}), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
