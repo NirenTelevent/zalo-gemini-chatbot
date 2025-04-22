@@ -95,8 +95,8 @@ from flask import send_from_directory
 
 
 @app.route('/zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
-def verify_zalo(filename):
-    return send_from_directory('static', f'zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
+def verify_zalo():
+    return send_from_directory('static', 'zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
 
 
 if __name__ == '__main__':
