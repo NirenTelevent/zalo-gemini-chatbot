@@ -102,3 +102,13 @@ def verify_zalo():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
 
+from flask import jsonify, request
+
+
+@app.route('/webhook', methods=['POST'])
+def zalo_webhook():
+    data = request.get_json()
+    print("📩 Nhận request webhook từ Zalo:", data)
+    
+    # Trả về 200 OK ngay lập tức
+    return jsonify({"status": "received"}), 200
