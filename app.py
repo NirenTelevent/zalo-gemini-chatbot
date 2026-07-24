@@ -22,108 +22,10 @@ app.secret_key = "your_secret_key"
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
-# API KEY
-API_KEY = api_key=os.getenv("GEMINI_API_KEY")
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
 
-def call_gemini_api(user_input, history=[]):
-    headers = {"Content-Type": "application/json"}
-
-    contents = []
-
-    # Chỉ thêm SYSTEM_PROMPT nếu history đang rỗng (tức lần đầu)
-    if not history:
-        contents.append({"role": "model", "parts": [{"text": SYSTEM_PROMPT}]})
-
-    #  Chỉ thêm doc_info nếu lần đầu hoặc nếu bạn muốn dán lại khi liên quan
-    doc_info = agent_tracuu_tailieu(user_input)
-    if doc_info :
-        contents.append({"role": "model", "parts": [{"text": doc_info}]})
-
-    # Thêm phần lịch sử hội thoại
-    for role, message in history:
-        contents.append({
-            "role": "user" if role == "user" else "model",
-            "parts": [{"text": message}]
-        })
-
-    # Thêm câu hỏi mới
-    contents.append({"role": "user", "parts": [{"text": user_input}]})
-    data = {"contents": contents}
-
-    try:
-        response = requests.post(API_URL, headers=headers, json=data)
-        if response.status_code == 200:
-            result = response.json()
-            return result["candidates"][0]["content"]["parts"][0]["text"]
-        else:
-            return f"Lỗi API: {response.status_code} - {response.text}"
-    except Exception as e:
-        return f"Lỗi kết nối: {e}"
-
-@app.route("/")
 def home():
     return render_template("index.html")
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json()
-    user_question = data.get("question", "")
-
-    # Tạo history nếu chưa có
-    if "chat_history" not in session:
-        session["chat_history"] = []
-
-    chat_history = session["chat_history"]
-
-    # Định dạng lại history để gửi cho Gemini
-    formatted_history = []
-    for msg in chat_history:
-        formatted_history.append((msg["role"], msg["message"]))
-
-    # Gọi API Gemini
-    answer = call_gemini_api(user_question, formatted_history)
-
-    # Cập nhật lại lịch sử chat
-    chat_history.append({"role": "user", "message": user_question})
-    chat_history.append({"role": "bot", "message": answer})
-    session["chat_history"] = chat_history
-
-    return jsonify({"answer": answer})
-
-from flask import send_from_directory
-
-
-@app.route('/zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
-def verify_zalo():
-    return send_from_directory('static', 'zalo_verifierS_FZCR3oCYXQn88qe_C3DdlmqJcNXWTbE3Wo.html')
-
-import json
-
-from flask import jsonify, request
-
-from zalo_webhook_handler import send_zalo_reply  # import hàm bạn vừa tạo
-
-
-@app.route('/webhook', methods=['POST'])
-def zalo_webhook():
-    data = request.get_json()
-
-    # Ghi log ra file
-    with open("data/last_webhook.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-    # (Có thể gửi phản hồi ở đây nếu cần)
-    return jsonify({"status": "received"}), 200
-
-@app.route('/test-log')
-def test_log():
-    try:
-        with open("data/last_webhook.json", encoding="utf-8") as f:
-            data = json.load(f)
-        return f"<pre>{json.dumps(data, indent=2, ensure_ascii=False)}</pre>"
-    except Exception as e:
-        return f"Lỗi đọc file: {e}"
 
 
 if __name__ == '__main__':
